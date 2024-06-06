@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-
 	router := gin.Default()
 
 	router.GET("/movies", controller.GetMovies)
