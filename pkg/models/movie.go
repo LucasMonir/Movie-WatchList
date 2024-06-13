@@ -1,9 +1,6 @@
 package models
 
-import "gorm.io/gorm"
-
 type Movie struct {
-	gorm.Model
 	Name    string  `json:"name"`
 	Watched bool    `json:"watched"`
 	Rating  float32 `json:"rating"`

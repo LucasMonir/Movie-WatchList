@@ -1,12 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"movie-watchlist/pkg/controller"
+	repo "movie-watchlist/pkg/repository"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	if !repo.InitDb() {
+		fmt.Println("Error while initializing database!")
+		return
+	}
+
 	router := gin.Default()
 
 	router.GET("/movies", controller.GetMovies)
