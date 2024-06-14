@@ -9,23 +9,22 @@ import (
 )
 
 func main() {
-	if !repo.InitDb() {
+	if !repo.CheckStorageCreated() {
 		fmt.Println("Error while initializing database!")
 		return
 	}
 
+	startServer()
+}
+
+func startServer() {
+	base := "/movies"
 	router := gin.Default()
 
-	router.GET("/movies", controller.GetMovies)
-
-	router.GET("/movies/:id", controller.GetMovie)
-
-	router.GET("/movies/delete/:id", controller.DeleteMovie)
-
-	router.GET("/movies/insert", controller.InsertMovie)
-
-	router.GET("/movies/rate/:id", controller.RateMovie)
-
+	router.GET(base, controller.GetMovies)
+	router.GET(base+"/:id", controller.GetMovie)
+	router.GET(base+"/delete/:id", controller.DeleteMovie)
+	router.GET(base+"/insert", controller.InsertMovie)
+	router.GET(base+"/rate/:id", controller.RateMovie)
 	router.Run("localhost:9800")
-
 }

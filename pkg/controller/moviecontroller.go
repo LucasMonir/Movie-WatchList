@@ -1,13 +1,15 @@
 package controller
 
 import (
+	"movie-watchlist/pkg/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetMovies(context *gin.Context) {
-	context.IndentedJSON(http.StatusOK, nil)
+	movies := repository.ReadMovies()
+	context.IndentedJSON(http.StatusOK, movies)
 }
 
 func GetMovie(context *gin.Context) {
