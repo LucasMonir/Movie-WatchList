@@ -23,8 +23,8 @@ func startServer() {
 
 	router.GET(base, controller.GetMovies)
 	router.GET(base+"/:id", controller.GetMovie)
-	router.GET(base+"/delete/:id", controller.DeleteMovie)
-	router.GET(base+"/insert", controller.InsertMovie)
-	router.GET(base+"/rate/:id", controller.RateMovie)
+	router.DELETE(base+"/delete/:id", controller.DeleteMovie)
+	router.POST(base+"/insert", controller.AddMovie)
+	router.PUT(base+"/rate/:id", controller.RateMovie)
 	router.Run("localhost:9800")
 }
