@@ -1,7 +1,14 @@
 [
-{
-    "name":"starwars",
-    "watched": false,
-    "rating": 2
-}
+	{
+		"id": 0,
+		"name": "starwars",
+		"watched": false,
+		"rating": 2
+	},
+	{
+		"id": 1,
+		"name": "TestMovie",
+		"watched": false,
+		"rating": 0
+	}
 ]

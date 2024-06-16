@@ -53,3 +53,40 @@ func ReadMovies() []models.Movie {
 
 	return movies
 }
+
+func CreateMovie(name string) bool {
+	movie := models.NewMovie(name)
+	movies := ReadMovies()
+
+	if len(movies) != 0 {
+		movie.Id = getLastId(movies)
+	} else {
+		movie.Id = 1
+	}
+
+	movies = append(movies, movie)
+	json, err := json.MarshalIndent(movies, "", "	")
+
+	if utils.CheckError(err) {
+		fmt.Println("Error Marshaling the JSON...")
+		return false
+	}
+
+	err = writeToStorage(json)
+
+	if utils.CheckError(err) {
+		fmt.Println("Error while writing movie to storage")
+		return false
+	}
+
+	fmt.Println("Movie added successfully!")
+	return true
+}
+
+func getLastId(movies []models.Movie) int {
+	return movies[len(movies)-1].Id + 1
+}
+
+func writeToStorage(movies []byte) error {
+	return os.WriteFile(utils.GetTaskFilePath(), movies, 0644)
+}
