@@ -1,5 +1,7 @@
 package models
 
+import "fmt"
+
 type Movie struct {
 	Id      int     `json:"id"`
 	Name    string  `json:"name"`
@@ -7,10 +9,23 @@ type Movie struct {
 	Rating  float32 `json:"rating"`
 }
 
-func NewMovie(name string) Movie {
-	return Movie{
+func NewMovie(name string) (Movie, error) {
+	movie := Movie{}
+
+	if !checkMovie(name) {
+		fmt.Println()
+		return movie, fmt.Errorf("invalid name parameter...")
+	}
+
+	movie = Movie{
 		Name:    name,
 		Watched: false,
 		Rating:  0,
 	}
+
+	return movie, nil
+}
+
+func checkMovie(name string) bool {
+	return len(name) > 0
 }

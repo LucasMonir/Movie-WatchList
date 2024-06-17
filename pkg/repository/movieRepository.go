@@ -55,7 +55,12 @@ func ReadMovies() []models.Movie {
 }
 
 func CreateMovie(name string) bool {
-	movie := models.NewMovie(name)
+	movie, err := models.NewMovie(name)
+
+	if utils.CheckError(err) {
+		return false
+	}
+
 	movies := ReadMovies()
 
 	if len(movies) != 0 {
