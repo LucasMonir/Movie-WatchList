@@ -20,11 +20,13 @@ func CheckStorageCreated() bool {
 	return true
 }
 
+// Temporary file storage... migrate to mysql
 func CheckStorageExists(jsonPath string) bool {
 	info, err := os.Stat(jsonPath)
 	return !(os.IsNotExist(err) || utils.CheckError(err) || info.IsDir() || utils.IsFileEmpty(jsonPath))
 }
 
+// Temporary file storage... migrate to mysql
 func initStorage(jsonPath string) {
 
 	err := os.WriteFile(jsonPath, []byte("[]"), fs.ModePerm)
