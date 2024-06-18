@@ -7,6 +7,7 @@ import (
 	"movie-watchlist/pkg/models"
 	"movie-watchlist/pkg/utils"
 	"os"
+	"slices"
 )
 
 // Temporary file storage... migrate to mysql
@@ -35,7 +36,7 @@ func initStorage(jsonPath string) {
 	}
 }
 
-func ReadMovies() []models.Movie {
+func ReadMovies() ([]models.Movie, error) {
 	var movies []models.Movie
 	jsonPath := utils.GetTaskFilePath()
 
@@ -44,16 +45,16 @@ func ReadMovies() []models.Movie {
 	jsonFile, err := os.ReadFile(jsonPath)
 
 	if utils.CheckError(err) {
-		return movies
+		return movies, err
 	}
 
 	err = json.Unmarshal(jsonFile, &movies)
 
 	if utils.CheckError(err) {
-		return movies
+		return movies, err
 	}
 
-	return movies
+	return movies, nil
 }
 
 func CreateMovie(name string) bool {
@@ -63,7 +64,7 @@ func CreateMovie(name string) bool {
 		return false
 	}
 
-	movies := ReadMovies()
+	movies, err := ReadMovies()
 
 	if len(movies) != 0 {
 		movie.Id = getLastId(movies)
@@ -87,6 +88,40 @@ func CreateMovie(name string) bool {
 	}
 
 	fmt.Println("Movie added successfully!")
+	return true
+}
+
+func RateMovie(id int, rating float32) bool {
+	fmt.Println(id, rating)
+	movies, err := ReadMovies()
+
+	if utils.CheckError(err) {
+		fmt.Println("Error while reading movies")
+		return false
+	}
+
+	movieIndex := slices.IndexFunc[[]models.Movie](movies, func(m models.Movie) bool { return m.Id == id })
+	movie := movies[movieIndex]
+
+	fmt.Println(movie)
+
+	movie.Rating = rating
+	movies[movieIndex] = movie
+
+	json, err := json.MarshalIndent(movies, "", "	")
+
+	if utils.CheckError(err) {
+		fmt.Println("Error serializing to json")
+		return false
+	}
+
+	err = writeToStorage(json)
+
+	if utils.CheckError(err) {
+		fmt.Println("Error serializing to json")
+		return false
+	}
+
 	return true
 }
 

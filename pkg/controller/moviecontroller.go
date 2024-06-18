@@ -13,14 +13,19 @@ import (
 )
 
 func GetMovies(context *gin.Context) {
-	movies := repository.ReadMovies()
+	movies, err := repository.ReadMovies()
+
+	if utils.CheckError(err) {
+		fmt.Println("Error while reading movies")
+		context.IndentedJSON(http.StatusInternalServerError, false)
+		return
+	}
+
 	context.IndentedJSON(http.StatusOK, movies)
 }
 
 func GetMovie(context *gin.Context) {
-	idParam := context.Param("id")
-
-	id, err := strconv.Atoi(idParam)
+	id, err := getIdFromParams(context.Params)
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while converting ID parameter to int")
@@ -28,15 +33,14 @@ func GetMovie(context *gin.Context) {
 		return
 	}
 
-	movies := repository.ReadMovies()
+	movies, err := repository.ReadMovies()
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while reading movies")
-		context.IndentedJSON(http.StatusBadRequest, false)
+		context.IndentedJSON(http.StatusInternalServerError, false)
 		return
 	}
 
-	fmt.Println(id)
 	movieIndex := slices.IndexFunc[[]models.Movie](movies, func(m models.Movie) bool { return m.Id == id })
 
 	fmt.Println(movieIndex)
@@ -61,5 +65,35 @@ func DeleteMovie(context *gin.Context) {
 }
 
 func RateMovie(context *gin.Context) {
-	context.IndentedJSON(http.StatusOK, nil)
+	id, err := getIdFromParams(context.Params)
+
+	if utils.CheckError(err) {
+		fmt.Println("Invalid ID parameter")
+		context.IndentedJSON(http.StatusBadRequest, false)
+		return
+	}
+
+	rating, err := strconv.ParseFloat(context.Query("rating"), 32)
+
+	if utils.CheckError(err) {
+		fmt.Println("Invalid Rating parameter")
+		context.IndentedJSON(http.StatusBadRequest, false)
+		return
+	}
+
+	result := repository.RateMovie(id, float32(rating))
+
+	if !result {
+		fmt.Println("Error updating movie rating...")
+		context.IndentedJSON(http.StatusInternalServerError, false)
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, "Rating added sucessfully!")
+}
+
+func getIdFromParams(params gin.Params) (int, error) {
+	idParam := params.ByName("id")
+
+	return strconv.Atoi(idParam)
 }
