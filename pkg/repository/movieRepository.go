@@ -57,14 +57,18 @@ func ReadMovies() ([]models.Movie, error) {
 	return movies, nil
 }
 
-func CreateMovie(name string) bool {
+func CreateMovie(name string) (bool, error) {
 	movie, err := models.NewMovie(name)
 
 	if utils.CheckError(err) {
-		return false
+		return false, fmt.Errorf("error creating new movie, check the parameters")
 	}
 
 	movies, err := ReadMovies()
+
+	if utils.CheckError(err) {
+		return false, fmt.Errorf("error while reading stored movies")
+	}
 
 	if len(movies) != 0 {
 		movie.Id = getLastId(movies)
@@ -76,19 +80,17 @@ func CreateMovie(name string) bool {
 	json, err := json.MarshalIndent(movies, "", "	")
 
 	if utils.CheckError(err) {
-		fmt.Println("Error Marshaling the JSON...")
-		return false
+		return false, fmt.Errorf("error Marshaling the JSON")
 	}
 
 	err = writeToStorage(json)
 
 	if utils.CheckError(err) {
-		fmt.Println("Error while writing movie to storage")
-		return false
+		return false, fmt.Errorf("error writing movie to storage")
 	}
 
 	fmt.Println("Movie added successfully!")
-	return true
+	return true, nil
 }
 
 func RateMovie(id int, rating float32) (bool, error) {

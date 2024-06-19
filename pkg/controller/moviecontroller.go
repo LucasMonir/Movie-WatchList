@@ -28,20 +28,23 @@ func GetMovie(context *gin.Context) {
 	id, err := getIdFromParams(context.Params)
 
 	if utils.CheckError(err) {
-		fmt.Println("Error while converting ID parameter to int")
-		context.IndentedJSON(http.StatusBadRequest, false)
+		context.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	movies, err := repository.ReadMovies()
 
 	if utils.CheckError(err) {
-		fmt.Println("Error while reading movies")
-		context.IndentedJSON(http.StatusInternalServerError, false)
+		context.IndentedJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	movieIndex := slices.IndexFunc[[]models.Movie](movies, func(m models.Movie) bool { return m.Id == id })
+
+	if movieIndex == -1 {
+		context.IndentedJSON(http.StatusInternalServerError, fmt.Errorf("no movie found with the id: %d", id).Error())
+		return
+	}
 
 	fmt.Println(movieIndex)
 	context.IndentedJSON(http.StatusOK, movies[movieIndex])
@@ -53,10 +56,16 @@ func AddMovie(context *gin.Context) {
 	err := context.BindJSON(&movie)
 
 	if utils.CheckError(err) {
-		context.IndentedJSON(http.StatusBadRequest, false)
+		context.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
 	}
 
-	result := repository.CreateMovie(movie.Name)
+	result, err := repository.CreateMovie(movie.Name)
+
+	if utils.CheckError(err) {
+		context.IndentedJSON(http.StatusBadRequest, err.Error())
+	}
+
 	context.IndentedJSON(http.StatusOK, result)
 }
 
