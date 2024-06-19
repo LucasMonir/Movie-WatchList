@@ -75,25 +75,21 @@ func RateMovie(context *gin.Context) {
 
 	rating, err := strconv.ParseFloat(context.Query("rating"), 32)
 
-	if utils.CheckError(err) || !checkRating(rating) {
+	if utils.CheckError(err) {
 		fmt.Println("Invalid Rating parameter")
-		context.IndentedJSON(http.StatusBadRequest, false)
+		context.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	result := repository.RateMovie(id, float32(rating))
+	result, err := repository.RateMovie(id, float32(rating))
 
 	if !result {
-		fmt.Println("Error updating movie rating...")
-		context.IndentedJSON(http.StatusInternalServerError, false)
+		fmt.Println(err.Error())
+		context.IndentedJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	context.IndentedJSON(http.StatusOK, "Rating added sucessfully!")
-}
-
-func checkRating(rating float64) bool {
-	return rating >= 0 && rating <= 10
 }
 
 func getIdFromParams(params gin.Params) (int, error) {

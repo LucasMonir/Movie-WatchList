@@ -91,16 +91,18 @@ func CreateMovie(name string) bool {
 	return true
 }
 
-func RateMovie(id int, rating float32) bool {
-	fmt.Println(id, rating)
+func RateMovie(id int, rating float32) (bool, error) {
+	if !checkRating(rating) {
+		return false, fmt.Errorf("invalid Rating: %f", rating)
+	}
+
 	movies, err := ReadMovies()
 
 	if utils.CheckError(err) {
-		fmt.Println("Error while reading movies")
-		return false
+		return false, fmt.Errorf("error while reading movies")
 	}
 
-	movieIndex := slices.IndexFunc[[]models.Movie](movies, func(m models.Movie) bool { return m.Id == id })
+	movieIndex := slices.IndexFunc(movies, func(m models.Movie) bool { return m.Id == id })
 	movie := movies[movieIndex]
 
 	fmt.Println(movie)
@@ -111,18 +113,16 @@ func RateMovie(id int, rating float32) bool {
 	json, err := json.MarshalIndent(movies, "", "	")
 
 	if utils.CheckError(err) {
-		fmt.Println("Error serializing to json")
-		return false
+		return false, fmt.Errorf("error serializing to json")
 	}
 
 	err = writeToStorage(json)
 
 	if utils.CheckError(err) {
-		fmt.Println("Error serializing to json")
-		return false
+		return false, fmt.Errorf("error serializing to json")
 	}
 
-	return true
+	return true, nil
 }
 
 func getLastId(movies []models.Movie) int {
@@ -131,4 +131,8 @@ func getLastId(movies []models.Movie) int {
 
 func writeToStorage(movies []byte) error {
 	return os.WriteFile(utils.GetTaskFilePath(), movies, 0644)
+}
+
+func checkRating(rating float32) bool {
+	return rating >= 0 && rating <= 10
 }
