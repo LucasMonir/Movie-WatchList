@@ -1,0 +1,20 @@
+[
+	{
+		"id": 0,
+		"name": "starwars",
+		"watched": false,
+		"rating": 2
+	},
+	{
+		"id": 1,
+		"name": "TestMovie",
+		"watched": false,
+		"rating": 10
+	},
+	{
+		"id": 2,
+		"name": "TestMovie2",
+		"watched": false,
+		"rating": 0
+	}
+]
