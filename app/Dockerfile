@@ -1,4 +1,5 @@
-FROM golang:1.22
+# Stage 1: Build the application
+FROM golang:1.22 AS builder
 
 WORKDIR /app
 
@@ -12,6 +13,13 @@ WORKDIR /app/cmd/main
 
 RUN go build -o /movie-watchlist
 
+# Stage 2: Run the application
+FROM alpine:latest
+
+WORKDIR /root/
+
+COPY --from=builder /movie-watchlist .
+
 EXPOSE 9800
 
-CMD [ "/movie-watchlist" ]
+CMD [ "movie-watchlist" ]
