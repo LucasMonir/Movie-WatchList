@@ -1,4 +1,0 @@
--SQLite
--Gin/Gonic
--Hosting
--Crud

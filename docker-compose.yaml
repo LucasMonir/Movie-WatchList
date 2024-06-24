@@ -1,0 +1,22 @@
+# services:
+#   mysql:
+#     image: mysql:lts
+#     environment:
+#       MYSQL_DATABASE: 'movies'
+#       MYSQL_USER: 'movies'
+#       MYSQL_PASSWORD: 'movies'
+#       MYSQL_ROOT_PASSWORD: 'movies'
+#     ports:
+#       - '3306:3306'  # Mapping port 3306 (MySQL default) inside the container to 3400 on the host
+#     expose:
+#       - '3306'
+  
+#   app:
+#     image: movie_watch_list/movie
+#     build:
+#       context: ./app
+#       dockerfile: ./app.Dockerfile
+#     ports:
+#       - '9800:9800'
+#     expose:
+#       - '9800'
