@@ -1,4 +1,3 @@
-# Stage 1: Build the application
 FROM golang:1.22 AS builder
 
 WORKDIR /app
@@ -9,17 +8,17 @@ RUN go mod download
 
 COPY . .
 
-WORKDIR /app/cmd/main
+RUN go build -o /app/bin/app cmd/main/main.go
 
-RUN go build -o /movie-watchlist
+FROM alpine:3.18
 
-# Stage 2: Run the application
-FROM alpine:latest
+RUN apk --no-cache add libc6-compat
 
-WORKDIR /root/
+WORKDIR /app
 
-COPY --from=builder /movie-watchlist .
+COPY --from=builder /app/bin/app /app/app
 
 EXPOSE 9800
 
-CMD [ "movie-watchlist" ]
+
+CMD ["/app/app"]
