@@ -1,20 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"movie-watchlist/pkg/controller"
-	repo "movie-watchlist/pkg/repository"
+	"movie-watchlist/pkg/db"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	if !repo.CheckStorageCreated() {
-		fmt.Println("Error while initializing database!")
-		return
-	}
+	db.InitDb()
+	// if !repo.CheckStorageCreated() {
+	// 	fmt.Println("Error while initializing database!")
+	// 	return
+	// }
 
-	startServer()
+	// startServer()
 }
 
 func startServer() {
