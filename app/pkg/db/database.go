@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"movie-watchlist/pkg/models"
 	"movie-watchlist/pkg/utils"
 
@@ -11,12 +10,7 @@ import (
 )
 
 func InitDb() {
-	db := pg.Connect(&pg.Options{
-		Addr:     ":5432",
-		User:     "postgres",
-		Password: "lu123cas",
-		Database: "movie-watchlist",
-	})
+	db := GetConnection()
 
 	defer db.Close()
 
@@ -25,8 +19,6 @@ func InitDb() {
 	if utils.CheckError(db.Ping(ctx)) {
 		return
 	}
-
-	fmt.Println("db created, creating schema")
 
 	err := CreateSchema(db)
 
@@ -42,7 +34,8 @@ func CreateSchema(db *pg.DB) error {
 	}
 
 	for _, model := range models {
-		err := db.Model(model).CreateTable(&orm.CreateTableOptions{})
+
+		err := db.Model(model).CreateTable(&orm.CreateTableOptions{IfNotExists: true})
 
 		if utils.CheckError(err) {
 			return err
@@ -50,4 +43,13 @@ func CreateSchema(db *pg.DB) error {
 	}
 
 	return nil
+}
+
+func GetConnection() *pg.DB {
+	return pg.Connect(&pg.Options{
+		Addr:     ":5432",
+		User:     "postgres",
+		Password: "lu123cas",
+		Database: "movie-watchlist",
+	})
 }

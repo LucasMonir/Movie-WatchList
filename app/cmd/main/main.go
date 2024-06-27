@@ -9,12 +9,8 @@ import (
 
 func main() {
 	db.InitDb()
-	// if !repo.CheckStorageCreated() {
-	// 	fmt.Println("Error while initializing database!")
-	// 	return
-	// }
 
-	// startServer()
+	startServer()
 }
 
 func startServer() {
@@ -22,9 +18,9 @@ func startServer() {
 	router := gin.Default()
 
 	router.GET(base, controller.GetMovies)
-	router.GET(base+"/:id", controller.GetMovie)
-	router.DELETE(base+"/delete/:id", controller.DeleteMovie)
+	// router.GET(base+"/:id", controller.GetMovie)
+	// router.DELETE(base+"/delete/:id", controller.DeleteMovie)
 	router.POST(base+"/insert", controller.AddMovie)
-	router.PATCH(base+"/rate/:id", controller.RateMovie)
+	// router.PATCH(base+"/rate/:id", controller.RateMovie)
 	router.Run("0.0.0.0:9800")
 }
