@@ -18,7 +18,7 @@ func startServer() {
 	router := gin.Default()
 
 	router.GET(base, controller.GetMovies)
-	// router.GET(base+"/:id", controller.GetMovie)
+	router.GET(base+"/:id", controller.GetMovie)
 	// router.DELETE(base+"/delete/:id", controller.DeleteMovie)
 	router.POST(base+"/insert", controller.AddMovie)
 	// router.PATCH(base+"/rate/:id", controller.RateMovie)

@@ -6,6 +6,7 @@ import (
 	"movie-watchlist/pkg/repository"
 	"movie-watchlist/pkg/utils"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,31 +23,23 @@ func GetMovies(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, movies)
 }
 
-// func GetMovie(context *gin.Context) {
-// 	id, err := getIdFromParams(context.Params)
+func GetMovie(context *gin.Context) {
+	id, err := getIdFromParams(context.Params)
 
-// 	if utils.CheckError(err) {
-// 		context.IndentedJSON(http.StatusBadRequest, err.Error())
-// 		return
-// 	}
+	if utils.CheckError(err) {
+		context.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
-// 	movies, err := repository.ReadMovies()
+	movie, err := repository.ReadMovie(id)
 
-// 	if utils.CheckError(err) {
-// 		context.IndentedJSON(http.StatusInternalServerError, err.Error())
-// 		return
-// 	}
+	if err != nil {
+		context.IndentedJSON(http.StatusInternalServerError, fmt.Errorf("no movie found with the id: %d", id).Error())
+		return
+	}
 
-// 	movieIndex := slices.IndexFunc[[]models.Movie](movies, func(m models.Movie) bool { return m.Id == id })
-
-// 	if movieIndex == -1 {
-// 		context.IndentedJSON(http.StatusInternalServerError, fmt.Errorf("no movie found with the id: %d", id).Error())
-// 		return
-// 	}
-
-// 	fmt.Println(movieIndex)
-// 	context.IndentedJSON(http.StatusOK, movies[movieIndex])
-// }
+	context.IndentedJSON(http.StatusOK, movie)
+}
 
 func AddMovie(context *gin.Context) {
 	var movie = models.Movie{}
@@ -99,8 +92,8 @@ func AddMovie(context *gin.Context) {
 // 	context.IndentedJSON(http.StatusOK, "Rating added sucessfully!")
 // }
 
-// func getIdFromParams(params gin.Params) (int, error) {
-// 	idParam := params.ByName("id")
+func getIdFromParams(params gin.Params) (int, error) {
+	idParam := params.ByName("id")
 
-// 	return strconv.Atoi(idParam)
-// }
+	return strconv.Atoi(idParam)
+}
