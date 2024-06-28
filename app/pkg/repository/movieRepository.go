@@ -7,48 +7,6 @@ import (
 	"movie-watchlist/pkg/utils"
 )
 
-// func RateMovie(id int, rating float32) (bool, error) {
-// 	if !checkRating(rating) {
-// 		return false, fmt.Errorf("invalid Rating: %f", rating)
-// 	}
-
-// 	movies, err := ReadMovies()
-
-// 	if utils.CheckError(err) {
-// 		return false, fmt.Errorf("error while reading movies")
-// 	}
-
-// 	movieIndex := slices.IndexFunc(movies, func(m models.Movie) bool { return m.Id == id })
-// 	movie := movies[movieIndex]
-
-// 	fmt.Println(movie)
-
-// 	movie.Rating = rating
-// 	movies[movieIndex] = movie
-
-// 	json, err := json.MarshalIndent(movies, "", "	")
-
-// 	if utils.CheckError(err) {
-// 		return false, fmt.Errorf("error serializing to json")
-// 	}
-
-// 	err = writeToStorage(json)
-
-// 	if utils.CheckError(err) {
-// 		return false, fmt.Errorf("error serializing to json")
-// 	}
-
-// 	return true, nil
-// }
-
-// func getLastId(movies []models.Movie) int {
-// 	return movies[len(movies)-1].Id + 1
-// }
-
-// func writeToStorage(movies []byte) error {
-// 	return os.WriteFile(utils.GetTaskFilePath(), movies, 0644)
-// }
-
 func ReadMovies() ([]models.Movie, error) {
 	var movies []models.Movie
 
@@ -69,7 +27,6 @@ func ReadMovie(id int) (models.Movie, error) {
 	var movie models.Movie
 
 	db := db.GetConnection()
-
 	defer db.Close()
 
 	err := db.Model(&movie).Where("id = ?", id).Select()
@@ -89,6 +46,7 @@ func CreateMovie(name string) (bool, error) {
 	}
 
 	db := db.GetConnection()
+	defer db.Close()
 
 	result, err := db.Model(&movie).Insert()
 
@@ -100,35 +58,40 @@ func CreateMovie(name string) (bool, error) {
 }
 
 func RateMovie(id int, rating float32) (bool, error) {
-	// if !checkRating(rating) {
-	// 	return false, fmt.Errorf("invalid Rating: %f", rating)
-	// }
+	if !checkRating(rating) {
+		return false, fmt.Errorf("ratings must be equal or between 0 and 10: %f", rating)
+	}
 
-	// movies, err := ReadMovie()
+	movie := models.Movie{}
+	db := db.GetConnection()
+	defer db.Close()
 
-	// if utils.CheckError(err) {
-	// 	return false, fmt.Errorf("error while reading movies")
-	// }
+	result, err := db.Model(&movie).Set("rating = ?", rating).Where("id = ?", id).Update()
 
-	// movieIndex := slices.IndexFunc(movies, func(m models.Movie) bool { return m.Id == id })
-	// movie := movies[movieIndex]
+	if utils.CheckError(err) || result.RowsAffected() == 0 {
+		return false, fmt.Errorf("error while updating records: %s", err.Error())
+	}
 
-	// fmt.Println(movie)
+	return true, nil
+}
 
-	// movie.Rating = rating
-	// movies[movieIndex] = movie
+func DeleteMovie(id int) (bool, error) {
+	movie := models.Movie{}
 
-	// json, err := json.MarshalIndent(movies, "", "	")
+	_, err := ReadMovie(id)
 
-	// if utils.CheckError(err) {
-	// 	return false, fmt.Errorf("error serializing to json")
-	// }
+	if utils.CheckError(err) {
+		return false, fmt.Errorf("movie not found")
+	}
 
-	// err = writeToStorage(json)
+	db := db.GetConnection()
+	defer db.Close()
 
-	// if utils.CheckError(err) {
-	// 	return false, fmt.Errorf("error serializing to json")
-	// }
+	result, err := db.Model(&movie).Where("id = ?", id).Delete()
+
+	if utils.CheckError(err) || result.RowsAffected() == 0 {
+		return false, fmt.Errorf("error while deleting movie: %s", err.Error())
+	}
 
 	return true, nil
 }

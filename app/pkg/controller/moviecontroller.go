@@ -55,45 +55,60 @@ func AddMovie(context *gin.Context) {
 
 	if utils.CheckError(err) {
 		context.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
 	}
 
 	context.IndentedJSON(http.StatusOK, result)
 }
 
-// func DeleteMovie(context *gin.Context) {
-// 	context.IndentedJSON(http.StatusOK, nil)
-// }
+func RateMovie(context *gin.Context) {
+	id, err := getIdFromParams(context.Params)
 
-// func RateMovie(context *gin.Context) {
-// 	id, err := getIdFromParams(context.Params)
+	if utils.CheckError(err) {
+		fmt.Println("Invalid ID parameter")
+		context.IndentedJSON(http.StatusBadRequest, false)
+		return
+	}
 
-// 	if utils.CheckError(err) {
-// 		fmt.Println("Invalid ID parameter")
-// 		context.IndentedJSON(http.StatusBadRequest, false)
-// 		return
-// 	}
+	rating, err := strconv.ParseFloat(context.Query("rating"), 32)
 
-// 	rating, err := strconv.ParseFloat(context.Query("rating"), 32)
+	if utils.CheckError(err) {
+		fmt.Println("Invalid Rating parameter")
+		context.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
-// 	if utils.CheckError(err) {
-// 		fmt.Println("Invalid Rating parameter")
-// 		context.IndentedJSON(http.StatusBadRequest, err.Error())
-// 		return
-// 	}
+	result, err := repository.RateMovie(id, float32(rating))
 
-// 	result, err := repository.RateMovie(id, float32(rating))
+	if !result || err != nil {
+		fmt.Println(err.Error())
+		context.IndentedJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
 
-// 	if !result {
-// 		fmt.Println(err.Error())
-// 		context.IndentedJSON(http.StatusInternalServerError, err.Error())
-// 		return
-// 	}
-
-// 	context.IndentedJSON(http.StatusOK, "Rating added sucessfully!")
-// }
+	context.IndentedJSON(http.StatusOK, "Rating added sucessfully!")
+}
 
 func getIdFromParams(params gin.Params) (int, error) {
 	idParam := params.ByName("id")
 
 	return strconv.Atoi(idParam)
+}
+
+func DeleteMovie(context *gin.Context) {
+	id, err := getIdFromParams(context.Params)
+
+	if utils.CheckError(err) {
+		context.IndentedJSON(http.StatusBadRequest, "Invalid ID parameter")
+		return
+	}
+
+	result, err := repository.DeleteMovie(id)
+
+	if !result || err != nil {
+		context.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	context.IndentedJSON(http.StatusOK, result)
 }
