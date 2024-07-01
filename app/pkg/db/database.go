@@ -47,7 +47,7 @@ func CreateSchema(db *pg.DB) error {
 
 func GetConnection() *pg.DB {
 	return pg.Connect(&pg.Options{
-		Addr:     ":5432",
+		Addr:     "postgres:5432",
 		User:     "postgres",
 		Password: "lu123cas",
 		Database: "movie-watchlist",

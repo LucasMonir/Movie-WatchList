@@ -20,5 +20,4 @@ COPY --from=builder /app/bin/app /app/app
 
 EXPOSE 9800
 
-
 CMD ["/app/app"]

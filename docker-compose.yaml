@@ -1,22 +1,26 @@
-# services:
-#   mysql:
-#     image: mysql:lts
-#     environment:
-#       MYSQL_DATABASE: 'movies'
-#       MYSQL_USER: 'movies'
-#       MYSQL_PASSWORD: 'movies'
-#       MYSQL_ROOT_PASSWORD: 'movies'
-#     ports:
-#       - '3306:3306'  # Mapping port 3306 (MySQL default) inside the container to 3400 on the host
-#     expose:
-#       - '3306'
-  
-#   app:
-#     image: movie_watch_list/movie
-#     build:
-#       context: ./app
-#       dockerfile: ./app.Dockerfile
-#     ports:
-#       - '9800:9800'
-#     expose:
-#       - '9800'
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: 
+      POSTGRES_USER: 
+      POSTGRES_DB: movie-watchlist
+    ports:
+      - "5432:5432"
+    networks:
+      - net-01
+
+  movie-watchlist:
+    build: ./app/
+    restart: always
+    ports:
+      - "9800:9800"
+    networks:
+      - net-01
+
+networks:
+  net-01:
+    driver: bridge
