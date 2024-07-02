@@ -4,6 +4,7 @@ import (
 	"context"
 	"movie-watchlist/pkg/models"
 	"movie-watchlist/pkg/utils"
+	"os"
 
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
@@ -47,9 +48,9 @@ func CreateSchema(db *pg.DB) error {
 
 func GetConnection() *pg.DB {
 	return pg.Connect(&pg.Options{
-		Addr:     "postgres:5432",
-		User:     "postgres",
-		Password: "lu123cas",
-		Database: "movie-watchlist",
+		Addr:     os.Getenv("PSQL-ADDRESS-PROD"),
+		User:     os.Getenv("PSQL-USER"),
+		Password: os.Getenv("PSQL-PASS"),
+		Database: os.Getenv("PSQL-DB"),
 	})
 }
