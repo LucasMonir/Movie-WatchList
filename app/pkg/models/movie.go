@@ -13,8 +13,7 @@ func NewMovie(name string) (Movie, error) {
 	movie := Movie{}
 
 	if !checkMovie(name) {
-		fmt.Println()
-		return movie, fmt.Errorf("invalid name parameter...")
+		return movie, fmt.Errorf("invalid name parameter")
 	}
 
 	movie = Movie{
