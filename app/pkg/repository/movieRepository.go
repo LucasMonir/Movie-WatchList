@@ -17,7 +17,7 @@ func ReadMovies() ([]models.Movie, error) {
 	err := db.Model(&movies).Select()
 
 	if utils.CheckError(err) {
-		return nil, err
+		return movies, err
 	}
 
 	return movies, nil

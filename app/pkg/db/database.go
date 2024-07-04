@@ -48,7 +48,7 @@ func CreateSchema(db *pg.DB) error {
 
 func GetConnection() *pg.DB {
 	return pg.Connect(&pg.Options{
-		Addr:     os.Getenv("PSQL-ADDRESS-PROD"),
+		Addr:     os.Getenv("PSQL-ADDRESS-HML"),
 		User:     os.Getenv("PSQL-USER"),
 		Password: os.Getenv("PSQL-PASS"),
 		Database: os.Getenv("PSQL-DB"),
