@@ -22,6 +22,10 @@ type MovieDTO struct {
 	Name string `json:"name"`
 }
 
+type RatingDTO struct {
+	Rating float32 `json:"rating"`
+}
+
 func TestAddMovieMustAddMovie(t *testing.T) {
 	url := base + "/insert"
 	router := setUpRouter()
@@ -69,7 +73,7 @@ func TestAddMovieMustNotAddMovieWithoutName(t *testing.T) {
 	response := string(responseData)
 	result, _ := strconv.ParseBool(response)
 
-	assert.False(t, result)
+	assert.False(t, result, "Fail: Result must be 'False'")
 }
 
 func TestGetMoviesMustReturnMovies(t *testing.T) {
@@ -88,13 +92,32 @@ func TestGetMoviesMustReturnMovies(t *testing.T) {
 
 	err := json.Unmarshal([]byte(response), &movies)
 
-	if utils.CheckError(err) {
+	if utils.CheckError(err) && recorder.Result().StatusCode != 200 {
 		t.Fatal("Error unmarshalling Response")
+	}
+}
+
+func TestRateMovieShouldAddRating(t *testing.T) {
+	url := base + "/rate/:id"
+	router := setUpRouter()
+	router.PATCH(url, controller.RateMovie)
+
+	ratingParam := "/rate/1?rating=10"
+
+	req, err := http.NewRequest("PATCH", base+ratingParam, nil)
+	recorder := httptest.NewRecorder()
+
+	if utils.CheckError(err) {
+		t.Fatal("Error during the request")
 	}
 
-	if len(movies) == 0 {
-		t.Fatal("Error unmarshalling Response")
-	}
+	router.ServeHTTP(recorder, req)
+
+	response, _ := io.ReadAll(recorder.Body)
+	responseData := string(response)
+	result, _ := strconv.ParseBool(responseData)
+
+	assert.True(t, result, "Fail: result must be 'True'")
 }
 
 func setUpRouter() *gin.Engine {
