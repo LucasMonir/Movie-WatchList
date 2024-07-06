@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"movie-watchlist/pkg/models"
 	"movie-watchlist/pkg/utils"
 	"os"
@@ -11,6 +12,7 @@ import (
 )
 
 func InitDb() {
+	checkEnvVars()
 	db := GetConnection()
 
 	defer db.Close()
@@ -48,9 +50,17 @@ func CreateSchema(db *pg.DB) error {
 
 func GetConnection() *pg.DB {
 	return pg.Connect(&pg.Options{
-		Addr:     os.Getenv("PSQL-ADDRESS-HML"),
+		Addr:     os.Getenv("PSQL-ADDRESS-PROD"),
 		User:     os.Getenv("PSQL-USER"),
 		Password: os.Getenv("PSQL-PASS"),
 		Database: os.Getenv("PSQL-DB"),
 	})
+}
+
+func checkEnvVars() {
+	fmt.Println("====== Checking environment ======")
+	fmt.Println(os.Getenv("PSQL-ADDRESS-PROD"))
+	fmt.Println(os.Getenv("PSQL-USER"))
+	fmt.Println(os.Getenv("PSQL-PASS"))
+	fmt.Println(os.Getenv("PSQL-DB"))
 }
