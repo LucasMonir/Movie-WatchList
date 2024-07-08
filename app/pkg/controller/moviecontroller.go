@@ -51,21 +51,20 @@ func AddMovie(context *gin.Context) {
 		return
 	}
 
-	result, err := repository.CreateMovie(movie.Name)
+	result, id, err := repository.CreateMovie(movie.Name)
 
-	if utils.CheckError(err) {
+	if utils.CheckError(err) || !result {
 		context.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	context.IndentedJSON(http.StatusOK, result)
+	context.IndentedJSON(http.StatusOK, id)
 }
 
 func RateMovie(context *gin.Context) {
 	id, err := getIdFromParams(context.Params)
 
 	if utils.CheckError(err) {
-		fmt.Println("Invalid ID parameter")
 		context.IndentedJSON(http.StatusBadRequest, false)
 		return
 	}
@@ -73,7 +72,6 @@ func RateMovie(context *gin.Context) {
 	rating, err := strconv.ParseFloat(context.Query("rating"), 32)
 
 	if utils.CheckError(err) {
-		fmt.Println("Invalid Rating parameter")
 		context.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -86,7 +84,7 @@ func RateMovie(context *gin.Context) {
 		return
 	}
 
-	context.IndentedJSON(http.StatusOK, "Rating added sucessfully!")
+	context.IndentedJSON(http.StatusOK, true)
 }
 
 func getIdFromParams(params gin.Params) (int, error) {

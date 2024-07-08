@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"movie-watchlist/pkg/controller"
 	"movie-watchlist/pkg/models"
@@ -17,6 +18,7 @@ import (
 )
 
 var base = "/movies"
+var movieId = 0
 
 type MovieDTO struct {
 	Name string `json:"name"`
@@ -46,9 +48,10 @@ func TestAddMovieMustAddMovie(t *testing.T) {
 	responseData, _ := io.ReadAll(recorder.Body)
 
 	response := string(responseData)
-	result, _ := strconv.ParseBool(response)
+	result, _ := strconv.Atoi(response)
 
-	assert.True(t, result)
+	assert.NotEqual(t, movieId, result)
+	movieId = result
 }
 
 func TestAddMovieMustNotAddMovieWithoutName(t *testing.T) {
@@ -102,7 +105,7 @@ func TestRateMovieShouldAddRating(t *testing.T) {
 	router := setUpRouter()
 	router.PATCH(url, controller.RateMovie)
 
-	ratingParam := "/rate/1?rating=10"
+	ratingParam := fmt.Sprintf("/rate/%d?rating=10", movieId)
 
 	req, err := http.NewRequest("PATCH", base+ratingParam, nil)
 	recorder := httptest.NewRecorder()
@@ -120,7 +123,76 @@ func TestRateMovieShouldAddRating(t *testing.T) {
 	assert.True(t, result, "Fail: result must be 'True'")
 }
 
+func TestRateMovieShouldNotAddRating(t *testing.T) {
+	url := base + "/rate/:id"
+	router := setUpRouter()
+	router.PATCH(url, controller.RateMovie)
+
+	ratingParam := fmt.Sprintf("/rate/%d?rating=14", movieId)
+
+	req, err := http.NewRequest("PATCH", base+ratingParam, nil)
+	recorder := httptest.NewRecorder()
+
+	if utils.CheckError(err) {
+		t.Fatal("Error during the request")
+	}
+
+	router.ServeHTTP(recorder, req)
+
+	assert.NotEqual(t, int(http.StatusOK), recorder.Result().StatusCode)
+}
+
+func TestDeleteMovieShouldDeleteMovie(t *testing.T) {
+	url := base + "/delete/:id"
+	deleteUrl := base + fmt.Sprintf("/delete/%d", movieId)
+
+	router := setUpRouter()
+	router.DELETE(url, controller.DeleteMovie)
+
+	req, err := http.NewRequest("DELETE", deleteUrl, nil)
+	recorder := httptest.NewRecorder()
+
+	if utils.CheckError(err) {
+		t.Fatal("Error during the request")
+	}
+
+	router.ServeHTTP(recorder, req)
+
+	response, _ := io.ReadAll(recorder.Body)
+	responseData := string(response)
+	result, _ := strconv.ParseBool(responseData)
+
+	assert.True(t, result)
+}
+
+func TestDeleteMovieShouldNotDeleteMovieInvalidId(t *testing.T) {
+	url := base + "/delete/:id"
+	deleteUrl := base + fmt.Sprintf("/delete/%d", fakeId())
+
+	router := setUpRouter()
+	router.DELETE(url, controller.DeleteMovie)
+
+	req, err := http.NewRequest("DELETE", deleteUrl, nil)
+	recorder := httptest.NewRecorder()
+
+	if utils.CheckError(err) {
+		t.Fatal("Error during the request")
+	}
+
+	router.ServeHTTP(recorder, req)
+
+	response, _ := io.ReadAll(recorder.Body)
+	responseData := string(response)
+	result, _ := strconv.ParseBool(responseData)
+
+	assert.False(t, result)
+}
+
 func setUpRouter() *gin.Engine {
 	router := gin.Default()
 	return router
+}
+
+func fakeId() int {
+	return movieId * 17
 }

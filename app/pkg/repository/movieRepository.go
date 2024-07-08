@@ -38,11 +38,11 @@ func ReadMovie(id int) (models.Movie, error) {
 	return movie, nil
 }
 
-func CreateMovie(name string) (bool, error) {
+func CreateMovie(name string) (bool, int, error) {
 	movie, err := models.NewMovie(name)
 
 	if utils.CheckError(err) {
-		return false, fmt.Errorf("error creating new movie, check the parameters")
+		return false, 0, fmt.Errorf("error creating new movie, check the parameters")
 	}
 
 	db := db.GetConnection()
@@ -51,10 +51,10 @@ func CreateMovie(name string) (bool, error) {
 	result, err := db.Model(&movie).Insert()
 
 	if utils.CheckError(err) || result.RowsAffected() == 0 {
-		return false, fmt.Errorf("error inserting movie into database")
+		return false, 0, fmt.Errorf("error inserting movie into database")
 	}
-
-	return true, nil
+	fmt.Println(movie.Id)
+	return true, movie.Id, nil
 }
 
 func RateMovie(id int, rating float32) (bool, error) {
