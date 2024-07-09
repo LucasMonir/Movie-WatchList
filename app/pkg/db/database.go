@@ -50,7 +50,7 @@ func CreateSchema(db *pg.DB) error {
 
 func GetConnection() *pg.DB {
 	return pg.Connect(&pg.Options{
-		Addr:     os.Getenv("PSQL_ADDRESS-PROD"),
+		Addr:     os.Getenv("PSQL_ADDRESS_HML"),
 		User:     os.Getenv("PSQL_USER"),
 		Password: os.Getenv("PSQL_PASS"),
 		Database: os.Getenv("PSQL_DB"),
@@ -59,7 +59,7 @@ func GetConnection() *pg.DB {
 
 func checkEnvVars() {
 	fmt.Println("====== Checking environment ======")
-	fmt.Println(os.Getenv("PSQL_ADDRESS_PROD"))
+	fmt.Println(os.Getenv("PSQL_ADDRESS_HML"))
 	fmt.Println(os.Getenv("PSQL_USER"))
 	fmt.Println(os.Getenv("PSQL_PASS"))
 	fmt.Println(os.Getenv("PSQL_DB"))
