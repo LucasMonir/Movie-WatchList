@@ -1,5 +1,10 @@
 package utils
 
 func CheckError(err error) bool {
-	return err != nil
+	if err != nil {
+		LogError(err)
+		return true
+	}
+
+	return false
 }
