@@ -26,5 +26,5 @@ func NewMovie(name string) (Movie, error) {
 }
 
 func checkMovie(name string) bool {
-	return len(name) > 0
+	return len(name) > 0 && name != "" && name != " "
 }

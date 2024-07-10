@@ -53,7 +53,7 @@ func CreateMovie(name string) (bool, int, error) {
 	if utils.CheckError(err) || result.RowsAffected() == 0 {
 		return false, 0, fmt.Errorf("error inserting movie into database")
 	}
-	fmt.Println(movie.Id)
+
 	return true, movie.Id, nil
 }
 
