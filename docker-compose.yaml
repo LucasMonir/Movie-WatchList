@@ -13,6 +13,8 @@ services:
     networks:
       - net-01
 
+  # logger
+
   movie-watchlist:
     environment:
       PSQL_USER: $PSQL_USER
