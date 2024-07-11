@@ -167,7 +167,7 @@ func TestDeleteMovieShouldDeleteMovie(t *testing.T) {
 
 func TestDeleteMovieShouldNotDeleteMovieInvalidId(t *testing.T) {
 	url := base + "/delete/:id"
-	deleteUrl := base + fmt.Sprintf("/delete/%d", fakeId())
+	deleteUrl := base + fmt.Sprintf("/delete/%d", fakeId(movieId))
 
 	router := setUpRouter()
 	router.DELETE(url, controller.DeleteMovie)
@@ -193,6 +193,6 @@ func setUpRouter() *gin.Engine {
 	return router
 }
 
-func fakeId() int {
-	return movieId * 17
+func fakeId(id int) int {
+	return id * 17
 }
