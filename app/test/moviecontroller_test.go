@@ -189,7 +189,7 @@ func TestDeleteMovieShouldNotDeleteMovieInvalidId(t *testing.T) {
 }
 
 func setUpRouter() *gin.Engine {
-	router := gin.Default()
+	router := gin.New()
 	return router
 }
 

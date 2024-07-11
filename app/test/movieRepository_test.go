@@ -67,3 +67,33 @@ func TestReadMoviesMustNotReturnMovieWithInvalidId(t *testing.T) {
 	assert.NotNil(t, err, "Error should not be nil, expected error reading movie")
 	assert.True(t, result.Id == 0, "Error should not be nil, expected error reading movie")
 }
+
+func TestRateMovieMustAddRatingToMovie(t *testing.T) {
+	rating := 10
+	result, err := repository.RateMovie(testMovieId, float32(rating))
+
+	assert.Nil(t, err, "Err was expected to be nil")
+	assert.True(t, result)
+}
+
+func TestRateMovieMustNotAddInvalidRatingToMovie(t *testing.T) {
+	rating := 999
+	result, err := repository.RateMovie(testMovieId, float32(rating))
+
+	assert.NotNil(t, err, "Err was not expected to be nil")
+	assert.False(t, result)
+}
+
+func TestDeleteMovieMustDeleteMovie(t *testing.T) {
+	result, err := repository.DeleteMovie(testMovieId)
+
+	assert.Nil(t, err, "Err was expected to be nil")
+	assert.True(t, result, "Return must be true")
+}
+
+func TestDeleteMovieMustNotDeleteMovieWithInvalidId(t *testing.T) {
+	result, err := repository.DeleteMovie(fakeId(testMovieId))
+
+	assert.NotNil(t, err, "Err was not expected to be nil")
+	assert.False(t, result, "Return must be false ")
+}
