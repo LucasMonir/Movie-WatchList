@@ -13,7 +13,14 @@ services:
     networks:
       - net-01
 
-  # logger
+  rabbitmq: 
+    image: rabbitmq:3.13-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+    networks:
+      - net-01
 
   movie-watchlist:
     environment:
@@ -22,6 +29,7 @@ services:
       PSQL_PASS: $PSQL_PASS 
       PSQL_ADDRESS_PROD: $PSQL_ADDRESS_PROD
       PSQL_ADDRESS_HML: $PSQL_ADDRESS_HML
+      RABBIT_MQ_PROD: $RABBIT_MQ_PROD
     build: ./app/
     restart: always
     ports:
@@ -29,6 +37,14 @@ services:
     networks:
       - net-01
 
+  logger:
+    environment:
+      RABBIT_MQ_PROD: $RABBIT_MQ_PROD
+    build: ./logger/
+    restart: always
+    networks:
+      - net-01
+      
 networks:
   net-01:
     driver: bridge

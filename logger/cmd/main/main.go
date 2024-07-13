@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"log"
 	"logger/pkg/utils"
+	"os"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func main() {
-	connection, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-
+	checkEnvironment()
+	connection, err := amqp.Dial(os.Getenv("RABBIT_MQ_PROD"))
+	fmt.Println(err.Error())
 	if utils.CheckError(err) {
 		panic("Error while starting queue service")
 	}
@@ -74,4 +76,8 @@ func main() {
 
 	log.Printf(" [*] Waiting for logs. To exit press CTRL+C")
 	<-forever
+}
+
+func checkEnvironment() {
+	fmt.Println(os.Getenv("RABBIT_MQ_PROD"))
 }

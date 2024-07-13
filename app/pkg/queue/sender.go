@@ -3,13 +3,14 @@ package queue
 import (
 	"context"
 	"movie-watchlist/pkg/utils"
+	"os"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func SendLogToServer(message string) bool {
-	connection, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	connection, err := amqp.Dial(os.Getenv("RABBIT_MQ_PROD"))
 
 	if utils.CheckError(err) {
 		panic("Error while starting queue service")
