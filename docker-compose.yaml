@@ -16,9 +16,11 @@ services:
   rabbitmq: 
     image: rabbitmq:3.13-alpine
     container_name: rabbitmq
+    hostname: "rabbitmq"
     restart: unless-stopped
     ports:
       - "5672:5672"
+      - "15672:15672"
     networks:
       - net-01
 
@@ -36,6 +38,8 @@ services:
       - "9800:9800"
     networks:
       - net-01
+    depends_on:
+      - logger
 
   logger:
     environment:
@@ -44,6 +48,8 @@ services:
     restart: always
     networks:
       - net-01
+    depends_on:
+      - rabbitmq
       
 networks:
   net-01:

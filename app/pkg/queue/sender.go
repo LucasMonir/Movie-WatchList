@@ -2,6 +2,7 @@ package queue
 
 import (
 	"context"
+	"fmt"
 	"movie-watchlist/pkg/utils"
 	"os"
 	"time"
@@ -13,13 +14,13 @@ func SendLogToServer(message string) bool {
 	connection, err := amqp.Dial(os.Getenv("RABBIT_MQ_PROD"))
 
 	if utils.CheckError(err) {
-		panic("Error while starting queue service")
+		fmt.Println("Error while starting queue service")
 	}
 
 	channel, err := connection.Channel()
 
 	if utils.CheckError(err) {
-		panic("Error while starting queue service")
+		fmt.Println("Error while starting queue service")
 	}
 
 	defer channel.Close()
@@ -33,7 +34,7 @@ func SendLogToServer(message string) bool {
 	})
 
 	if utils.CheckError(err) {
-		panic("Error while starting queue service")
+		fmt.Println("Error while starting queue service")
 	}
 
 	return true
