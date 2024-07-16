@@ -14,7 +14,7 @@ services:
       - net-01
 
   rabbitmq: 
-    image: rabbitmq:3.13-alpine
+    image: rabbitmq:latest
     container_name: rabbitmq
     hostname: "rabbitmq"
     restart: unless-stopped

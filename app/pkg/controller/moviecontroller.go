@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"movie-watchlist/pkg/models"
+	"movie-watchlist/pkg/queue"
 	"movie-watchlist/pkg/repository"
 	"movie-watchlist/pkg/utils"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 )
 
 func GetMovies(context *gin.Context) {
+	queue.SendLogToServer("Testing!")
 	movies, err := repository.ReadMovies()
 
 	if utils.CheckError(err) {

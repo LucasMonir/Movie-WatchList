@@ -11,10 +11,17 @@ import (
 
 func main() {
 	checkEnvironment()
-	connection, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 
-	if utils.CheckError(err) {
-		fmt.Println("Error while starting queue service")
+	var err error = fmt.Errorf("Placeholder")
+	var connection *amqp.Connection
+
+	for err != nil {
+		connection, err = amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+
+		if utils.CheckError(err) {
+			fmt.Println("Error while connecting to rabbitmq")
+			fmt.Print(err.Error())
+		}
 	}
 
 	defer connection.Close()
@@ -23,44 +30,24 @@ func main() {
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while starting channel service")
+		fmt.Print(err.Error())
 	}
 
 	defer channel.Close()
 
-	err = channel.ExchangeDeclare(
-		"movie-watchlist-log",
-		"direct",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-
-	fmt.Println("declared exhc")
-
-	if utils.CheckError(err) {
-		fmt.Println("Error while declaring exchange")
-	}
-
 	queue, err := channel.QueueDeclare(
-		"",
-		false,
-		false,
+		"logs",
 		true,
+		false,
+		false,
 		false,
 		nil,
 	)
-
-	fmt.Println("declared wqueue")
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while declaring queue")
+		fmt.Print(err.Error())
 	}
-
-	channel.QueueBind(queue.Name, "log", "movie-watchlist-log", false, nil)
-
-	fmt.Println("bound queue")
 
 	msgs, err := channel.Consume(
 		queue.Name,
@@ -74,6 +61,7 @@ func main() {
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while consuming messages")
+		fmt.Print(err.Error())
 	}
 
 	var forever chan struct{}
