@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"movie-watchlist/pkg/utils"
+	"os"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -14,7 +15,7 @@ func SendLogToServer(message string) bool {
 	var connection *amqp.Connection
 
 	for err != nil {
-		connection, err = amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+		connection, err = amqp.Dial(os.Getenv("RABBIT_MQ_PROD"))
 
 		if utils.CheckError(err) {
 			fmt.Println("Error while connecting to rabbitmq")
