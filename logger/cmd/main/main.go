@@ -35,8 +35,9 @@ func main() {
 
 	defer channel.Close()
 
-	queue, err := channel.QueueDeclare(
+	err = channel.ExchangeDeclare(
 		"logs",
+		"direct",
 		true,
 		false,
 		false,
@@ -45,7 +46,34 @@ func main() {
 	)
 
 	if utils.CheckError(err) {
+		fmt.Println("Error while declaring exchange")
+		fmt.Print(err.Error())
+	}
+
+	queue, err := channel.QueueDeclare(
+		"",
+		false,
+		false,
+		true,
+		false,
+		nil,
+	)
+
+	if utils.CheckError(err) {
 		fmt.Println("Error while declaring queue")
+		fmt.Print(err.Error())
+	}
+
+	err = channel.QueueBind(
+		queue.Name,
+		"logs",
+		"logs",
+		false,
+		nil,
+	)
+
+	if utils.CheckError(err) {
+		fmt.Println("Error while consuming messages")
 		fmt.Print(err.Error())
 	}
 
@@ -59,16 +87,11 @@ func main() {
 		nil,
 	)
 
-	if utils.CheckError(err) {
-		fmt.Println("Error while consuming messages")
-		fmt.Print(err.Error())
-	}
-
 	var forever chan struct{}
 
 	go func() {
 		for d := range msgs {
-			fmt.Printf(" [x] %s", d.Body)
+			log.Printf(" [x] %s", d.Body)
 		}
 	}()
 

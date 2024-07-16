@@ -3,13 +3,11 @@ package main
 import (
 	"movie-watchlist/pkg/controller"
 	"movie-watchlist/pkg/db"
-	"movie-watchlist/pkg/queue"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	queue.SendLogToServer("Testing!")
 	db.InitDb()
 	startServer()
 }

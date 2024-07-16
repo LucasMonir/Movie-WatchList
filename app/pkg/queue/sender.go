@@ -19,18 +19,23 @@ func SendLogToServer(message string) bool {
 		if utils.CheckError(err) {
 			fmt.Println("Error while connecting to rabbitmq")
 			fmt.Print(err.Error())
+			return false
 		}
 	}
+
+	defer connection.Close()
 
 	channel, err := connection.Channel()
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while opening channel")
 		fmt.Print(err.Error())
+		return false
 	}
 
-	queue, err := channel.QueueDeclare(
+	err = channel.ExchangeDeclare(
 		"logs",
+		"direct",
 		true,
 		false,
 		false,
@@ -41,24 +46,30 @@ func SendLogToServer(message string) bool {
 	if utils.CheckError(err) {
 		fmt.Println("Error while creating queue")
 		fmt.Print(err.Error())
+		return false
 	}
 
 	defer channel.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	err = channel.PublishWithContext(
 		ctx,
-		"",
-		queue.Name, false, false, amqp.Publishing{
+		"logs",
+		"logs",
+		false,
+		false,
+		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(message),
-		})
+		},
+	)
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while publishing message")
 		fmt.Print(err.Error())
+		return false
 	}
 
 	return true
