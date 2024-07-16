@@ -1,17 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"movie-watchlist/pkg/controller"
 	"movie-watchlist/pkg/db"
-	"movie-watchlist/pkg/queue"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	fmt.Println(queue.SendLogToServer("Db is oooon!"))
-
 	db.InitDb()
 	startServer()
 }
