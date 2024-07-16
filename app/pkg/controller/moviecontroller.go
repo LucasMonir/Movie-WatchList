@@ -13,7 +13,8 @@ import (
 )
 
 func GetMovies(context *gin.Context) {
-	queue.SendLogToServer("Testing!")
+	queue.SendLogToServer("[GET] GetMovies")
+
 	movies, err := repository.ReadMovies()
 
 	if utils.CheckError(err) {
@@ -26,6 +27,7 @@ func GetMovies(context *gin.Context) {
 }
 
 func GetMovie(context *gin.Context) {
+	queue.SendLogToServer("[GET] GetMovie")
 	id, err := getIdFromParams(context.Params)
 
 	if utils.CheckError(err) {
@@ -44,6 +46,8 @@ func GetMovie(context *gin.Context) {
 }
 
 func AddMovie(context *gin.Context) {
+	queue.SendLogToServer("[POST] AddMovie")
+
 	var movie = models.Movie{}
 
 	err := context.BindJSON(&movie)
@@ -64,6 +68,8 @@ func AddMovie(context *gin.Context) {
 }
 
 func RateMovie(context *gin.Context) {
+	queue.SendLogToServer("[PATCH] RateMovie")
+
 	id, err := getIdFromParams(context.Params)
 
 	if utils.CheckError(err) {
@@ -89,13 +95,9 @@ func RateMovie(context *gin.Context) {
 	context.IndentedJSON(http.StatusOK, true)
 }
 
-func getIdFromParams(params gin.Params) (int, error) {
-	idParam := params.ByName("id")
-
-	return strconv.Atoi(idParam)
-}
-
 func DeleteMovie(context *gin.Context) {
+	queue.SendLogToServer("[DELETE] DeleteMovie")
+
 	id, err := getIdFromParams(context.Params)
 
 	if utils.CheckError(err) {
@@ -111,4 +113,10 @@ func DeleteMovie(context *gin.Context) {
 	}
 
 	context.IndentedJSON(http.StatusOK, result)
+}
+
+func getIdFromParams(params gin.Params) (int, error) {
+	idParam := params.ByName("id")
+
+	return strconv.Atoi(idParam)
 }

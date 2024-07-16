@@ -3,6 +3,7 @@ package main
 import (
 	"movie-watchlist/pkg/controller"
 	"movie-watchlist/pkg/db"
+	"movie-watchlist/pkg/queue"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,4 +23,5 @@ func startServer() {
 	router.DELETE(base+"/delete/:id", controller.DeleteMovie)
 
 	router.Run("0.0.0.0:9800")
+	queue.SendLogToServer("App server started: port 9800!")
 }

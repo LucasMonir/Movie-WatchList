@@ -73,7 +73,7 @@ func main() {
 	)
 
 	if utils.CheckError(err) {
-		fmt.Println("Error while consuming messages")
+		fmt.Println("Error while binding queue")
 		fmt.Print(err.Error())
 	}
 
@@ -86,6 +86,11 @@ func main() {
 		false,
 		nil,
 	)
+
+	if utils.CheckError(err) {
+		fmt.Println("Error while consuming messages")
+		fmt.Print(err.Error())
+	}
 
 	var forever chan struct{}
 
