@@ -10,27 +10,33 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func SendLogToServer(message string) bool {
+func CheckRmqStarted() {
 	var err error = fmt.Errorf("Placeholder")
 	var connection *amqp.Connection
 
 	for err != nil {
+		time.Sleep(10 * time.Second)
 		connection, err = amqp.Dial(os.Getenv("RABBIT_MQ_PROD"))
+	}
 
-		if utils.CheckError(err) {
-			fmt.Println("Error while connecting to rabbitmq")
-			fmt.Print(err.Error())
-			return false
-		}
+	defer connection.Close()
+	fmt.Println("RabbitMQ connection started successfully!")
+}
+
+func SendLogToServer(message string) bool {
+	var connection *amqp.Connection
+
+	connection, err := amqp.Dial(os.Getenv("RABBIT_MQ_PROD"))
+
+	if utils.CheckAndPrintError(err) {
+		return false
 	}
 
 	defer connection.Close()
 
 	channel, err := connection.Channel()
 
-	if utils.CheckError(err) {
-		fmt.Println("Error while opening channel")
-		fmt.Print(err.Error())
+	if utils.CheckAndPrintError(err) {
 		return false
 	}
 
@@ -44,9 +50,7 @@ func SendLogToServer(message string) bool {
 		nil,
 	)
 
-	if utils.CheckError(err) {
-		fmt.Println("Error while creating queue")
-		fmt.Print(err.Error())
+	if utils.CheckAndPrintError(err) {
 		return false
 	}
 
@@ -67,11 +71,14 @@ func SendLogToServer(message string) bool {
 		},
 	)
 
-	if utils.CheckError(err) {
-		fmt.Println("Error while publishing message")
-		fmt.Print(err.Error())
+	return !utils.CheckAndPrintError(err)
+}
+
+func CheckAndLogError(err error) bool {
+	if !utils.CheckError(err) {
 		return false
 	}
 
+	SendLogToServer(err.Error())
 	return true
 }

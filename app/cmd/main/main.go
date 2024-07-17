@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	queue.CheckRmqStarted()
 	db.InitDb()
 	startServer()
 }
@@ -16,6 +17,7 @@ func main() {
 func startServer() {
 	base := "/movies"
 	router := gin.Default()
+
 	router.GET(base, controller.GetMovies)
 	router.GET(base+"/:id", controller.GetMovie)
 	router.POST(base+"/insert", controller.AddMovie)

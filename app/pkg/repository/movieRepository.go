@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"movie-watchlist/pkg/db"
 	"movie-watchlist/pkg/models"
+	"movie-watchlist/pkg/queue"
 	"movie-watchlist/pkg/utils"
 )
 
@@ -11,12 +12,11 @@ func ReadMovies() ([]models.Movie, error) {
 	var movies []models.Movie
 
 	db := db.GetConnection()
-
 	defer db.Close()
 
 	err := db.Model(&movies).Select()
 
-	if utils.CheckError(err) {
+	if queue.CheckAndLogError(err) {
 		return movies, err
 	}
 
@@ -31,7 +31,7 @@ func ReadMovie(id int) (models.Movie, error) {
 
 	err := db.Model(&movie).Where("id = ?", id).Select()
 
-	if utils.CheckError(err) {
+	if queue.CheckAndLogError(err) {
 		return movie, err
 	}
 
@@ -41,7 +41,7 @@ func ReadMovie(id int) (models.Movie, error) {
 func CreateMovie(name string) (bool, int, error) {
 	movie, err := models.NewMovie(name)
 
-	if utils.CheckError(err) {
+	if queue.CheckAndLogError(err) {
 		return false, 0, fmt.Errorf("error creating new movie, check the parameters")
 	}
 
@@ -50,7 +50,7 @@ func CreateMovie(name string) (bool, int, error) {
 
 	result, err := db.Model(&movie).Insert()
 
-	if utils.CheckError(err) || result.RowsAffected() == 0 {
+	if checkRowsUpdated(err, result.RowsAffected()) {
 		return false, 0, fmt.Errorf("error inserting movie into database")
 	}
 
@@ -68,7 +68,7 @@ func RateMovie(id int, rating float32) (bool, error) {
 
 	result, err := db.Model(&movie).Set("rating = ?", rating).Where("id = ?", id).Update()
 
-	if utils.CheckError(err) || result.RowsAffected() == 0 {
+	if checkRowsUpdated(err, result.RowsAffected()) {
 		return false, fmt.Errorf("error while updating records: %s", err.Error())
 	}
 
@@ -89,7 +89,7 @@ func DeleteMovie(id int) (bool, error) {
 
 	result, err := db.Model(&movie).Where("id = ?", id).Delete()
 
-	if utils.CheckError(err) || result.RowsAffected() == 0 {
+	if checkRowsUpdated(err, result.RowsAffected()) {
 		return false, fmt.Errorf("error while deleting movie: %s", err.Error())
 	}
 
@@ -98,4 +98,8 @@ func DeleteMovie(id int) (bool, error) {
 
 func checkRating(rating float32) bool {
 	return rating >= 0 && rating <= 10
+}
+
+func checkRowsUpdated(err error, rows int) bool {
+	return queue.CheckAndLogError(err) || rows == 0
 }

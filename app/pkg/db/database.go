@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"movie-watchlist/pkg/models"
+	"movie-watchlist/pkg/queue"
 	"movie-watchlist/pkg/utils"
 	"os"
 
@@ -29,6 +30,7 @@ func InitDb() {
 		return
 	}
 
+	queue.SendLogToServer("Database initialized successfully!")
 }
 
 func CreateSchema(db *pg.DB) error {
