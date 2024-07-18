@@ -5,23 +5,18 @@ import (
 	"log"
 	"logger/pkg/utils"
 	"os"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func main() {
 	checkEnvironment()
+	connection, err := connectRabbitMQ()
 
-	var err error = fmt.Errorf("Placeholder")
-	var connection *amqp.Connection
-
-	for err != nil {
-		connection, err = amqp.Dial(os.Getenv("RABBIT_MQ_PROD"))
-
-		if utils.CheckError(err) {
-			fmt.Println("Error while connecting to rabbitmq")
-			fmt.Print(err.Error())
-		}
+	if utils.CheckError(err) {
+		fmt.Println("Error connecting to rabbitmq")
+		fmt.Print(err.Error())
 	}
 
 	defer connection.Close()
@@ -35,15 +30,7 @@ func main() {
 
 	defer channel.Close()
 
-	err = channel.ExchangeDeclare(
-		"logs",
-		"direct",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
+	err = setUpExchange(channel)
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while declaring exchange")
@@ -106,4 +93,36 @@ func main() {
 
 func checkEnvironment() {
 	fmt.Println(os.Getenv("RABBIT_MQ_PROD"))
+}
+
+func connectRabbitMQ() (*amqp.Connection, error) {
+	var connection *amqp.Connection
+	var err error
+
+	for attempts := 0; attempts < 10; attempts++ {
+		connection, err = amqp.Dial(os.Getenv("RABBIT_MQ_PROD"))
+
+		if err == nil {
+			return connection, nil
+		}
+
+		log.Printf("Failed to connect to RabbitMQ, attempt %d: %v", attempts+1, err)
+		time.Sleep(5 * time.Second)
+	}
+
+	return nil, fmt.Errorf("could not connect to RabbitMQ after multiple attempts: %v", err)
+}
+
+func setUpExchange(channel *amqp.Channel) error {
+	err := channel.ExchangeDeclare(
+		"logs",
+		"direct",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+
+	return err
 }
