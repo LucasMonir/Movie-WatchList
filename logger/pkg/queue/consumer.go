@@ -3,12 +3,15 @@ package queue
 import (
 	"fmt"
 	"log"
+	"logger/pkg/models"
 	"logger/pkg/utils"
 	"os"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+var rmqConfig = models.GetRmqConfig()
 
 func ConsumeMessages() {
 	connection, err := ConnectRabbitMQ()
@@ -52,12 +55,12 @@ func ConsumeMessages() {
 
 	msgs, err := channel.Consume(
 		queue.Name,
-		"",
-		true,
-		false,
-		false,
-		false,
-		nil,
+		rmqConfig.Consumer,
+		rmqConfig.AutoAck,
+		rmqConfig.Exclusive,
+		rmqConfig.NoLocal,
+		rmqConfig.NoWait,
+		rmqConfig.Template,
 	)
 
 	if utils.CheckError(err) {
@@ -97,13 +100,13 @@ func ConnectRabbitMQ() (*amqp.Connection, error) {
 
 func setUpExchange(channel *amqp.Channel) error {
 	err := channel.ExchangeDeclare(
-		"logs",
-		"direct",
-		true,
-		false,
-		false,
-		false,
-		nil,
+		rmqConfig.Exchange,
+		rmqConfig.Kind,
+		rmqConfig.Durable,
+		rmqConfig.AutoDelete,
+		rmqConfig.Internal,
+		rmqConfig.NoWait,
+		rmqConfig.Template,
 	)
 
 	return err
@@ -112,11 +115,11 @@ func setUpExchange(channel *amqp.Channel) error {
 func setUpQueue(channel *amqp.Channel) (amqp.Queue, error) {
 	queue, err := channel.QueueDeclare(
 		"",
-		false,
-		false,
-		true,
-		false,
-		nil,
+		rmqConfig.Durable,
+		rmqConfig.AutoDelete,
+		rmqConfig.Exclusive,
+		rmqConfig.NoWait,
+		rmqConfig.Template,
 	)
 
 	if utils.CheckError(err) {
@@ -131,11 +134,11 @@ func setUpQueue(channel *amqp.Channel) (amqp.Queue, error) {
 
 func bindQueue(channel *amqp.Channel, queueName string) error {
 	err := channel.QueueBind(
-		queueName,
-		"logs",
-		"logs",
-		false,
-		nil,
+		rmqConfig.QueueName,
+		rmqConfig.Key,
+		rmqConfig.Exchange,
+		rmqConfig.NoWait,
+		rmqConfig.Template,
 	)
 
 	return err
