@@ -1,3 +1,13 @@
+# Technologies used:
+- Docker
+- Rabbitmq
+- PSQL
+- Golang
+
+# Apps:
+- Movie-watchlist: API with the sole purpose of storing and rating movies that I've watched in the past
+- Logger: Focused on logging, wasn't vital for the app but I added it as a way to practice more with docker, rabbitmq and containers in general
+
 # Dependencies:
 
 - Docker
