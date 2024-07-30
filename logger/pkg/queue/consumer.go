@@ -18,7 +18,6 @@ func ConsumeMessages() {
 
 	if utils.CheckError(err) {
 		fmt.Println("Error connecting to rabbitmq")
-		fmt.Print(err.Error())
 	}
 
 	defer connection.Close()
@@ -27,7 +26,6 @@ func ConsumeMessages() {
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while starting channel service")
-		fmt.Print(err.Error())
 	}
 
 	defer channel.Close()
@@ -36,21 +34,18 @@ func ConsumeMessages() {
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while declaring exchange")
-		fmt.Print(err.Error())
 	}
 
 	queue, err := setUpQueue(channel)
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while declaring queue")
-		fmt.Print(err.Error())
 	}
 
 	err = bindQueue(channel, queue.Name)
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while binding queue")
-		fmt.Print(err.Error())
 	}
 
 	msgs, err := channel.Consume(
@@ -65,7 +60,6 @@ func ConsumeMessages() {
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while consuming messages")
-		fmt.Print(err.Error())
 	}
 
 	var forever chan struct{}
@@ -124,8 +118,6 @@ func setUpQueue(channel *amqp.Channel) (amqp.Queue, error) {
 
 	if utils.CheckError(err) {
 		fmt.Println("Error while declaring queue")
-		fmt.Print(err.Error())
-
 		return amqp.Queue{}, err
 	}
 

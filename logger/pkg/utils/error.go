@@ -1,5 +1,12 @@
 package utils
 
+import "fmt"
+
 func CheckError(err error) bool {
-	return err != nil
+	if err != nil {
+		fmt.Print(err.Error())
+		return true
+	}
+
+	return false
 }
