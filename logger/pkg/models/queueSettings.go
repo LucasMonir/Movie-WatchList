@@ -24,7 +24,7 @@ func GetRmqConfig() RmqConfig {
 		Internal:   false,
 		AutoAck:    true,
 		Key:        "logs",
-		Durable:    false,
+		Durable:    true,
 		NoWait:     false,
 		Exchange:   "logs",
 		AutoDelete: false,
