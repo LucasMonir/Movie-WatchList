@@ -59,6 +59,10 @@ func GetConnection() *pg.DB {
 	})
 }
 
+func GetConnectionByValues() {
+
+}
+
 func checkEnvVars() {
 	fmt.Println("====== Checking environment ======")
 	fmt.Println(os.Getenv("PSQL_ADDRESS_PROD"))
